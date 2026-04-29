@@ -12,7 +12,7 @@ interface WorkerCardProps {
 
 export default function WorkerCard({ worker, isSaved }: WorkerCardProps) {
   return (
-    <Link href={`/workers/${worker.id}`} className="block">
+    <Link href={`/dashboard/workers/${worker.id}`} className="block">
       <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:border-primary/30 transition-all card-hover">
         <div className="flex items-start gap-3">
           <div className="w-12 h-12 rounded-xl bg-primary-light text-primary flex items-center justify-center text-sm font-bold flex-shrink-0">
@@ -26,7 +26,7 @@ export default function WorkerCard({ worker, isSaved }: WorkerCardProps) {
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-gray-900 truncate">{worker.name}</h3>
               {isSaved && (
-                <span className="text-xs text-red-400 flex-shrink-0">♥</span>
+                <span className="text-xs text-red-400 flex-shrink-0">&#9829;</span>
               )}
             </div>
             <p className="text-xs text-gray-500 mt-0.5">{worker.category}</p>

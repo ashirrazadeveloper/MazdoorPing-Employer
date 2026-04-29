@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Bell, LogOut } from 'lucide-react';
 import { getInitials } from '@/lib/utils';
@@ -11,9 +12,14 @@ export default function Header({ title, showBack, showNotifications, showMenu }:
   showMenu?: boolean;
 }) {
   const router = useRouter();
-  const userName = typeof window !== 'undefined' 
-    ? JSON.parse(localStorage.getItem('mazdoorping_user') || '{}').name || 'Employer' 
-    : 'Employer';
+  const [userName, setUserName] = React.useState('Employer');
+
+  React.useEffect(() => {
+    try {
+      const user = JSON.parse(localStorage.getItem('mazdoorping_user') || '{}');
+      if (user.name) setUserName(user.name);
+    } catch {}
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('mazdoorping_user');
@@ -52,7 +58,7 @@ export default function Header({ title, showBack, showNotifications, showMenu }:
         <div className="flex items-center gap-2">
           {showNotifications !== false && (
             <button
-              onClick={() => router.push('/notifications')}
+              onClick={() => router.push('/dashboard/notifications')}
               className="relative w-9 h-9 flex items-center justify-center rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors"
             >
               <Bell className="w-5 h-5 text-gray-600" />

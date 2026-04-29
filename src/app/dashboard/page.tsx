@@ -45,9 +45,9 @@ export default function DashboardPage() {
   ];
 
   const quickActions = [
-    { label: 'Post a Job', icon: PlusCircle, href: '/post-job', color: 'bg-primary text-white' },
-    { label: 'Find Workers', icon: Search, href: '/find-workers', color: 'bg-white text-primary border-2 border-primary' },
-    { label: 'My Bookings', icon: Briefcase, href: '/my-bookings', color: 'bg-white text-primary border-2 border-primary' },
+    { label: 'Post a Job', icon: PlusCircle, href: '/dashboard/post-job', color: 'bg-primary text-white' },
+    { label: 'Find Workers', icon: Search, href: '/dashboard/find-workers', color: 'bg-white text-primary border-2 border-primary' },
+    { label: 'My Bookings', icon: Briefcase, href: '/dashboard/my-bookings', color: 'bg-white text-primary border-2 border-primary' },
   ];
 
   return (
@@ -97,7 +97,7 @@ export default function DashboardPage() {
         <div>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-base font-bold text-gray-900">Browse Workers</h2>
-            <Link href="/find-workers" className="text-primary text-sm font-medium flex items-center gap-1">
+            <Link href="/dashboard/find-workers" className="text-primary text-sm font-medium flex items-center gap-1">
               View All <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -105,7 +105,7 @@ export default function DashboardPage() {
             {WORKER_CATEGORIES.slice(0, 8).map((category) => (
               <Link
                 key={category}
-                href={`/find-workers?category=${encodeURIComponent(category)}`}
+                href={`/dashboard/find-workers?category=${encodeURIComponent(category)}`}
                 className="flex flex-col items-center gap-1.5 p-3 bg-white rounded-2xl shadow-sm border border-gray-100 hover:border-primary/30 transition-colors"
               >
                 <span className="text-xl">{CATEGORY_ICONS[category as WorkerCategory]}</span>
@@ -119,7 +119,7 @@ export default function DashboardPage() {
         <div>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-base font-bold text-gray-900">Recent Job Postings</h2>
-            <Link href="/my-bookings" className="text-primary text-sm font-medium flex items-center gap-1">
+            <Link href="/dashboard/my-bookings" className="text-primary text-sm font-medium flex items-center gap-1">
               All Jobs <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -127,7 +127,7 @@ export default function DashboardPage() {
             {recentJobs.map((job) => (
               <Link
                 key={job.id}
-                href={`/bookings/${job.id}`}
+                href={`/dashboard/bookings/${job.id}`}
                 className="block bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:border-primary/30 transition-colors"
               >
                 <div className="flex items-start justify-between mb-2">

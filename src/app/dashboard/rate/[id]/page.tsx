@@ -39,7 +39,7 @@ export default function RateWorkerPage() {
     setSubmitting(true);
     setTimeout(() => {
       setSubmitting(false);
-      router.push('/my-bookings');
+      router.push('/dashboard/my-bookings');
     }, 1000);
   };
 

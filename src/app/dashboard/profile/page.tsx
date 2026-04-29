@@ -28,8 +28,8 @@ export default function ProfilePage() {
   const activeJobs = mockJobs.filter((j) => j.status === 'open' || j.status === 'in_progress').length;
 
   const menuItems = [
-    { icon: Briefcase, label: 'My Bookings', value: `${mockJobs.length} jobs`, href: '/my-bookings' },
-    { icon: Heart, label: 'Saved Workers', value: `${employer.saved_workers_count} workers`, href: '/favorites' },
+    { icon: Briefcase, label: 'My Bookings', value: `${mockJobs.length} jobs`, href: '/dashboard/my-bookings' },
+    { icon: Heart, label: 'Saved Workers', value: `${employer.saved_workers_count} workers`, href: '/dashboard/favorites' },
     { icon: Star, label: 'Reviews Given', value: `${employer.avg_rating_given} avg`, href: '#' },
     { icon: DollarSign, label: 'Spending Summary', value: formatPKR(employer.total_spent), href: '#' },
     { icon: Shield, label: 'Privacy & Settings', value: '', href: '#' },

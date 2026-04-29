@@ -93,7 +93,7 @@ export default function PostJobPage() {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      router.push('/my-bookings');
+      router.push('/dashboard/my-bookings');
     }, 1500);
   };
 

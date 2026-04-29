@@ -1,0 +1,17 @@
+{
+  "name": "MazdoorPing Employer",
+  "short_name": "MazdoorPing",
+  "description": "Find and hire skilled daily wage workers in Pakistan",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563EB",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ]
+}
