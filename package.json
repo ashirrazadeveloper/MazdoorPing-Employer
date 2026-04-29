@@ -1,38 +1,31 @@
 {
   "name": "mazdoorping-employer",
-  "version": "1.0.0",
-  "main": "expo-router/entry",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web",
-    "lint": "eslint . --ext .ts,.tsx",
-    "build:android": "eas build --platform android",
-    "build:ios": "eas build --platform ios"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
-    "@expo/vector-icons": "^14.0.4",
-    "@react-navigation/bottom-tabs": "^7.2.0",
-    "@react-navigation/native": "^7.0.14",
-    "@react-navigation/native-stack": "^7.2.0",
-    "@supabase/supabase-js": "^2.49.1",
-    "expo": "~52.0.40",
-    "expo-image-picker": "~16.0.6",
-    "expo-location": "~18.0.5",
-    "expo-status-bar": "~2.0.1",
-    "react": "18.3.1",
-    "react-native": "0.76.7",
-    "react-native-maps": "1.18.0",
-    "react-native-safe-area-context": "^5.3.0",
-    "react-native-screens": "~4.10.0",
-    "react-native-svg": "^15.11.2"
+    "@supabase/supabase-js": "^2.105.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.14.0",
+    "next": "14.2.35",
+    "react": "^18",
+    "react-dom": "^18",
+    "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.26.10",
-    "@types/react": "~18.3.18",
-    "@types/react-native": "~0.76.0",
-    "typescript": "~5.7.3"
-  },
-  "private": true
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.35",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
 }

@@ -1,110 +1,83 @@
 # MazdoorPing Employer App
 
-**Pakistan's #1 GPS Labor Marketplace — Employer Side**
-
-## Overview
-
-MazdoorPing Employer is the employer-facing mobile application for Pakistan's premier labor marketplace. Employers use this app to find skilled workers, post jobs, book workers, rate them, and manage all their bookings.
+**"Uber for Daily Wage Workers"** — Employer-facing web application for Pakistan.
 
 ## Tech Stack
-
-- **React Native + Expo** (SDK 52)
-- **TypeScript** 5.7
-- **Supabase** (Authentication, Database, Storage)
-- **React Navigation** (Bottom Tabs + Native Stack)
-- **expo-location** (Location services)
-- **expo-image-picker** (Photo uploads)
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript 5
+- **Styling**: Tailwind CSS with custom blue theme (#2563EB)
+- **Backend**: Supabase (Auth, Database, Realtime, Storage)
+- **Icons**: Lucide React
 
 ## Features
-
-- 🔐 **Phone OTP Authentication** — Secure login via SMS verification
-- 👷 **Find Workers** — Search and browse available workers by category, city, and name
-- 📋 **Post Jobs** — Create job listings with category, rate, location, urgency, and payment method
-- 📁 **My Bookings** — Track all posted jobs with status tabs (All, Active, Completed)
-- ⭐ **Rate Workers** — Star rating (1-5) with comments for completed jobs
-- ❤️ **Favorites** — Save preferred workers for quick booking
-- 📂 **Categories** — Browse 14 labor categories with Urdu names and worker counts
-- 🔔 **Notifications** — Real-time alerts for job updates, worker acceptance, and completions
-- 👤 **Profile Management** — Edit employer profile, verification status, settings
-
-## Color Theme
-
-Blue theme (#3B82F6 primary) — distinct from the Worker app's green theme.
-
-## Supabase Tables
-
-### `employers`
-```
-id, name, phone, email, type, city, area, verified, created_at
-```
-
-### `jobs`
-```
-id, title, category, description, rate, rate_type, status, city, area, address, urgent, payment_method, payment_status, worker_id, employer_id, created_at, completed_at
-```
-
-### `workers`
-```
-id, name, phone, email, cnic, photo, category, experience, rate, rate_type, rating, total_jobs, available, city, area, language, verified, premium, balance, total_earned, lat, lng, bio, created_at
-```
-
-### `reviews`
-```
-id, rating, comment, job_id, worker_id, employer_id, created_at
-```
-
-### `notifications`
-```
-id, title, message, type, read, employer_id, worker_id, created_at
-```
-
-### `favorites`
-```
-id, employer_id, worker_id, created_at
-```
+- 🔐 Authentication (Login/Register with Supabase Auth)
+- 📊 Dashboard with stats, categories, and quick actions
+- 📝 Multi-step job posting (5 steps)
+- 🔍 Find workers with search, filter, and sort
+- 👷 Worker detail profiles with reviews and ratings
+- 📋 My Bookings with tabs (Active, In Progress, Completed, Cancelled)
+- 📄 Job detail with bid management (Accept/Reject)
+- ❤️ Save favorite workers for quick rehire
+- 👤 Profile management with spending summary
+- 🔔 Real-time notifications
+- ⭐ Rate workers with star ratings and reviews
 
 ## Getting Started
 
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Create `.env` file from `.env.example` with your Supabase credentials
-4. Start the development server: `npx expo start`
+### 1. Install dependencies
+```bash
+npm install
+```
 
-## Demo Mode
+### 2. Set up environment variables
+```bash
+cp .env.local.example .env.local
+# Edit .env.local with your Supabase credentials
+```
 
-The app includes a full demo mode accessible via the "Skip — Enter Demo Mode" button on the login screen. Demo mode provides sample data for all screens without requiring a Supabase connection.
+### 3. Run development server
+```bash
+npm run dev
+```
+
+### 4. Build for production
+```bash
+npm run build
+```
 
 ## Project Structure
-
 ```
 src/
-├── lib/supabase.ts          # Supabase client
-├── types/index.ts           # TypeScript interfaces
-├── utils/
-│   ├── formatPKR.ts         # Currency formatting
-│   └── constants.ts         # Colors, categories, cities
-├── context/AuthContext.tsx   # Authentication state
-├── hooks/
-│   ├── useAuth.ts           # Auth hook
-│   ├── useJobs.ts           # Jobs CRUD
-│   ├── useWorkers.ts        # Workers & favorites
-│   └── useNotifications.ts  # Notifications
-├── navigation/AppNavigator.tsx
-├── components/              # Reusable UI components
-└── screens/                 # Screen components
-    ├── Auth/                # Login, Register
-    ├── Home/                # Dashboard
-    ├── Workers/             # Find & worker details
-    ├── Jobs/                # Post, bookings, details
-    ├── Categories/          # Category browser
-    ├── Favorites/           # Saved workers
-    ├── Reviews/             # Rate workers
-    ├── Notifications/       # Alerts
-    └── Profile/             # Employer profile
+  app/
+    layout.tsx            # Root layout
+    page.tsx              # Entry (redirect)
+    login/page.tsx        # Login page
+    register/page.tsx     # Registration page
+    (dashboard)/          # Authenticated routes
+      layout.tsx          # Bottom nav layout
+      page.tsx            # Home/Dashboard
+      post-job/page.tsx   # Multi-step job posting
+      find-workers/       # Worker search
+      workers/[id]/       # Worker detail
+      my-bookings/        # Job listings
+      bookings/[id]/      # Job detail with bids
+      favorites/          # Saved workers
+      profile/            # Employer profile
+      notifications/      # Notification center
+      rate/[id]/          # Rate worker
+  components/
+    layout/BottomNav.tsx  # Bottom navigation
+    layout/Header.tsx     # Page header
+    workers/WorkerCard.tsx
+  lib/
+    supabase.ts           # Supabase client
+    mock-data.ts          # Demo/mock data
+    utils.ts              # Utility functions
+  types/index.ts          # TypeScript types
 ```
 
-## Navigation
+## Demo Mode
+When Supabase is not configured, the app uses comprehensive mock data for all features.
 
-Bottom tabs: **Home** | **Find Workers** | **Post Job** | **Bookings** | **Profile**
-
-Stack screens accessible from tabs: Worker Detail, Job Detail, Categories, Favorites, Rate Worker, Notifications.
+## Deployment
+Ready for deployment on [Vercel](https://vercel.com).
