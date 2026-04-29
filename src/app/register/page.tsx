@@ -68,7 +68,7 @@ export default function RegisterPage() {
         role: 'employer',
       };
       localStorage.setItem('mazdoorping_user', JSON.stringify(mockUser));
-      router.push('/');
+      router.push('/dashboard');
     }, 1000);
   };
 

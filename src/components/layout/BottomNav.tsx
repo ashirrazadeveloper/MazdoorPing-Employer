@@ -12,7 +12,7 @@ import {
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { href: '/', label: 'Home', icon: Home },
+  { href: '/dashboard', label: 'Home', icon: Home },
   { href: '/post-job', label: 'Post Job', icon: PlusCircle },
   { href: '/my-bookings', label: 'My Jobs', icon: Briefcase },
   { href: '/favorites', label: 'Favorites', icon: Heart },
@@ -23,7 +23,7 @@ export default function BottomNav() {
   const pathname = usePathname();
 
   const isActive = (href: string) => {
-    if (href === '/') return pathname === '/' || pathname === '/find-workers';
+    if (href === '/dashboard') return pathname === '/dashboard' || pathname === '/find-workers';
     return pathname.startsWith(href);
   };
 

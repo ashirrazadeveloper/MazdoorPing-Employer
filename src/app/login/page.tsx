@@ -33,7 +33,7 @@ export default function LoginPage() {
         role: 'employer',
       };
       localStorage.setItem('mazdoorping_user', JSON.stringify(mockUser));
-      router.push('/');
+      router.push('/dashboard');
     }, 1000);
   };
 
