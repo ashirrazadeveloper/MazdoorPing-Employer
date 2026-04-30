@@ -2,7 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Building2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,7 +24,6 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
 
-    // Simulate login with mock data
     setTimeout(() => {
       const mockUser = {
         id: 'emp-1',
@@ -38,62 +40,69 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      {/* Header */}
-      <div className="bg-primary px-6 pt-12 pb-16 rounded-b-[32px]">
-        <div className="max-w-md mx-auto">
-          <div className="text-white mb-8">
-            <h1 className="text-3xl font-bold mb-2">MazdoorPing</h1>
-            <p className="text-blue-100 text-sm">Employer Portal</p>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Blue gradient header */}
+      <div className="bg-gradient-to-br from-blue-600 to-blue-700 px-6 pt-14 pb-20 rounded-b-[36px] relative overflow-hidden">
+        {/* Decorative circles */}
+        <div className="absolute -top-16 -right-16 w-48 h-48 bg-white/10 rounded-full" />
+        <div className="absolute bottom-4 -left-8 w-32 h-32 bg-white/5 rounded-full" />
+
+        <div className="max-w-md mx-auto relative z-10">
+          <div className="flex items-center gap-3 mb-10">
+            <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+              <Building2 className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-white tracking-tight">MazdoorPing</h1>
+              <p className="text-blue-200 text-xs font-medium">Employer Portal</p>
+            </div>
           </div>
-          <h2 className="text-white text-xl font-semibold">Welcome Back!</h2>
-          <p className="text-blue-100 text-sm mt-1">Sign in to manage your workforce</p>
+          <h2 className="text-2xl font-bold text-white">Welcome Back!</h2>
+          <p className="text-blue-100 text-sm mt-1.5">Sign in to manage your workforce</p>
         </div>
       </div>
 
-      {/* Form */}
-      <div className="flex-1 px-6 -mt-6">
-        <div className="bg-white rounded-2xl shadow-lg p-6 max-w-md mx-auto">
+      {/* Form card */}
+      <div className="flex-1 px-5 -mt-10 pb-8">
+        <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/60 p-6 max-w-md mx-auto border border-gray-100/50">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl mb-4 text-sm">
+            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl mb-5 text-sm animate-fade-in">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Email or Phone
-              </label>
+          <form onSubmit={handleLogin} className="space-y-5">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email or Phone</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Input
+                  id="email"
                   type="text"
                   placeholder="Enter email or phone"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                  className="pl-11 h-12 bg-gray-50/50 border-gray-200/80 focus-visible:bg-white"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Password
-              </label>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Input
+                  id="password"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-10 py-3 border border-gray-200 rounded-xl text-sm focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                  className="pl-11 pr-11 h-12 bg-gray-50/50 border-gray-200/80 focus-visible:bg-white"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -106,23 +115,23 @@ export default function LoginPage() {
               </button>
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-primary hover:bg-primary-hover text-white py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-colors disabled:opacity-60"
+              className="w-full h-12 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-semibold text-sm shadow-lg shadow-blue-600/25 transition-all"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
                 <>
                   Sign In
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </>
               )}
-            </button>
+            </Button>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="mt-6 pt-5 border-t border-gray-100 text-center">
             <p className="text-sm text-gray-500">
               Don&apos;t have an account?{' '}
               <button
@@ -137,9 +146,10 @@ export default function LoginPage() {
 
         {/* Demo hint */}
         <div className="max-w-md mx-auto mt-6 text-center">
-          <p className="text-xs text-gray-400">
+          <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-full text-xs font-medium">
+            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
             Demo: Enter any email and password to sign in
-          </p>
+          </div>
         </div>
       </div>
     </div>

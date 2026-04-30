@@ -24,6 +24,12 @@ import {
   type UrgencyLevel,
 } from '@/types';
 import { cn, formatPKR } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select } from '@/components/ui/select';
+import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogContent } from '@/components/ui/dialog';
 
 const steps = [
   { label: 'Category', icon: Tag },
@@ -37,6 +43,7 @@ export default function PostJobPage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const [form, setForm] = useState({
     category: '' as WorkerCategory | '',
@@ -93,7 +100,7 @@ export default function PostJobPage() {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      router.push('/dashboard/my-bookings');
+      setShowSuccess(true);
     }, 1500);
   };
 
@@ -104,53 +111,54 @@ export default function PostJobPage() {
     { value: 'negotiable', label: 'Negotiable' },
   ];
 
-  const urgencies: { value: UrgencyLevel; label: string; color: string }[] = [
-    { value: 'normal', label: 'Normal', color: 'bg-green-50 text-green-700 border-green-200' },
-    { value: 'urgent', label: 'Urgent', color: 'bg-orange-50 text-orange-700 border-orange-200' },
-    { value: 'very_urgent', label: 'Very Urgent', color: 'bg-red-50 text-red-700 border-red-200' },
+  const urgencies: { value: UrgencyLevel; label: string; color: string; activeColor: string }[] = [
+    { value: 'normal', label: 'Normal', color: 'border-gray-100 text-gray-500', activeColor: 'bg-green-50 text-green-700 border-green-200' },
+    { value: 'urgent', label: 'Urgent', color: 'border-gray-100 text-gray-500', activeColor: 'bg-orange-50 text-orange-700 border-orange-200' },
+    { value: 'very_urgent', label: 'Very Urgent', color: 'border-gray-100 text-gray-500', activeColor: 'bg-red-50 text-red-700 border-red-200' },
   ];
 
   return (
     <>
       <Header title="Post a Job" showBack />
-      <div className="px-4 py-4 space-y-4">
+      <div className="px-4 py-4 space-y-5">
         {/* Step Progress */}
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex gap-1 flex-1">
+        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+          <div className="flex gap-1.5 mb-3">
             {steps.map((step, idx) => (
               <div
                 key={step.label}
                 className={cn(
-                  'h-1.5 flex-1 rounded-full transition-colors',
-                  idx < currentStep ? 'bg-primary' : idx === currentStep ? 'bg-primary' : 'bg-gray-200'
+                  'h-2 flex-1 rounded-full transition-all duration-300',
+                  idx < currentStep ? 'bg-primary' : idx === currentStep ? 'bg-primary w-full' : 'bg-gray-100'
                 )}
               />
             ))}
           </div>
-        </div>
-        <div className="flex items-center justify-between">
-          <p className="text-xs text-gray-400">Step {currentStep + 1} of {steps.length}</p>
-          <p className="text-xs font-semibold text-primary">{steps[currentStep].label}</p>
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-gray-400">Step {currentStep + 1} of {steps.length}</p>
+            <p className="text-xs font-bold text-primary">{steps[currentStep].label}</p>
+          </div>
         </div>
 
         {/* Step 0: Category Selection */}
         {currentStep === 0 && (
-          <div>
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Select Category</h2>
+          <div className="space-y-4 animate-fade-in">
+            <h2 className="text-lg font-bold text-gray-900">Select Category</h2>
             <div className="grid grid-cols-2 gap-3">
               {WORKER_CATEGORIES.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => updateForm('category', cat)}
                   className={cn(
-                    'flex items-center gap-3 p-4 rounded-2xl border-2 transition-all text-left',
+                    'flex items-center gap-3 p-4 rounded-2xl border-2 transition-all text-left active:scale-[0.98]',
                     form.category === cat
-                      ? 'border-primary bg-primary-light'
-                      : 'border-gray-100 bg-white hover:border-primary/30'
+                      ? 'border-primary bg-blue-50 shadow-sm shadow-blue-100'
+                      : 'border-gray-100 bg-white hover:border-blue-200'
                   )}
                 >
                   <span className="text-2xl">{CATEGORY_ICONS[cat]}</span>
                   <span className="text-sm font-medium">{cat}</span>
+                  {form.category === cat && <Check className="w-4 h-4 text-primary ml-auto" />}
                 </button>
               ))}
             </div>
@@ -159,43 +167,42 @@ export default function PostJobPage() {
 
         {/* Step 1: Job Details */}
         {currentStep === 1 && (
-          <div className="space-y-4">
+          <div className="space-y-4 animate-fade-in">
             <h2 className="text-lg font-bold text-gray-900">Job Details</h2>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Job Title *</label>
-              <input
-                type="text"
+            <div className="space-y-2">
+              <Label>Job Title *</Label>
+              <Input
                 placeholder="e.g., Bathroom Pipe Repair"
                 value={form.title}
                 onChange={(e) => updateForm('title', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:border-primary"
+                className="h-12 bg-white"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Description *</label>
-              <textarea
+            <div className="space-y-2">
+              <Label>Description *</Label>
+              <Textarea
                 rows={4}
                 placeholder="Describe the job in detail..."
                 value={form.description}
                 onChange={(e) => updateForm('description', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:border-primary resize-none"
+                className="bg-white resize-none"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Budget Type</label>
+            <div className="space-y-2">
+              <Label>Budget Type</Label>
               <div className="grid grid-cols-2 gap-2">
                 {budgetTypes.map((bt) => (
                   <button
                     key={bt.value}
                     onClick={() => updateForm('budgetType', bt.value)}
                     className={cn(
-                      'px-4 py-2.5 rounded-xl text-sm font-medium border-2 transition-all',
+                      'px-4 py-3 rounded-xl text-sm font-medium border-2 transition-all active:scale-[0.98]',
                       form.budgetType === bt.value
-                        ? 'border-primary bg-primary-light text-primary'
-                        : 'border-gray-100 text-gray-600 hover:border-primary/30'
+                        ? 'border-primary bg-blue-50 text-primary'
+                        : 'border-gray-100 text-gray-600 hover:border-blue-200'
                     )}
                   >
                     {bt.label}
@@ -205,18 +212,16 @@ export default function PostJobPage() {
             </div>
 
             {form.budgetType !== 'negotiable' && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Budget Amount (PKR) *
-                </label>
+              <div className="space-y-2">
+                <Label>Budget Amount (PKR) *</Label>
                 <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <input
+                  <DollarSign className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Input
                     type="number"
                     placeholder="Enter amount"
                     value={form.budgetAmount}
                     onChange={(e) => updateForm('budgetAmount', e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:border-primary"
+                    className="pl-11 h-12 bg-white"
                   />
                 </div>
               </div>
@@ -226,45 +231,44 @@ export default function PostJobPage() {
 
         {/* Step 2: Location */}
         {currentStep === 2 && (
-          <div className="space-y-4">
+          <div className="space-y-4 animate-fade-in">
             <h2 className="text-lg font-bold text-gray-900">Location</h2>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">City *</label>
+            <div className="space-y-2">
+              <Label>City *</Label>
               <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <select
+                <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Select
                   value={form.city}
                   onChange={(e) => updateForm('city', e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:border-primary appearance-none bg-white"
+                  className="pl-11 h-12 bg-white appearance-none"
                 >
                   <option value="">Select city</option>
                   {CITIES.map((city) => (
                     <option key={city} value={city}>{city}</option>
                   ))}
-                </select>
+                </Select>
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Area</label>
-              <input
-                type="text"
+            <div className="space-y-2">
+              <Label>Area</Label>
+              <Input
                 placeholder="e.g., Gulberg, DHA"
                 value={form.area}
                 onChange={(e) => updateForm('area', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:border-primary"
+                className="h-12 bg-white"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Full Address</label>
-              <textarea
+            <div className="space-y-2">
+              <Label>Full Address</Label>
+              <Textarea
                 rows={2}
                 placeholder="Complete address for the job location"
                 value={form.address}
                 onChange={(e) => updateForm('address', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:border-primary resize-none"
+                className="bg-white resize-none"
               />
             </div>
           </div>
@@ -272,46 +276,46 @@ export default function PostJobPage() {
 
         {/* Step 3: Schedule */}
         {currentStep === 3 && (
-          <div className="space-y-4">
+          <div className="space-y-4 animate-fade-in">
             <h2 className="text-lg font-bold text-gray-900">Schedule</h2>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Date *</label>
+            <div className="space-y-2">
+              <Label>Date *</Label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
+                <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Input
                   type="date"
                   value={form.date}
                   onChange={(e) => updateForm('date', e.target.value)}
                   min={new Date().toISOString().split('T')[0]}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:border-primary"
+                  className="pl-11 h-12 bg-white"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Time</label>
+            <div className="space-y-2">
+              <Label>Time</Label>
               <div className="relative">
-                <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
+                <Clock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Input
                   type="time"
                   value={form.time}
                   onChange={(e) => updateForm('time', e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:border-primary"
+                  className="pl-11 h-12 bg-white"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Urgency</label>
+            <div className="space-y-2">
+              <Label>Urgency</Label>
               <div className="grid grid-cols-3 gap-2">
                 {urgencies.map((u) => (
                   <button
                     key={u.value}
                     onClick={() => updateForm('urgency', u.value)}
                     className={cn(
-                      'px-3 py-2.5 rounded-xl text-xs font-semibold border-2 transition-all',
-                      form.urgency === u.value ? u.color : 'border-gray-100 text-gray-500'
+                      'px-3 py-3 rounded-xl text-xs font-semibold border-2 transition-all active:scale-[0.98]',
+                      form.urgency === u.value ? u.activeColor : u.color
                     )}
                   >
                     {u.label}
@@ -324,67 +328,56 @@ export default function PostJobPage() {
 
         {/* Step 4: Requirements */}
         {currentStep === 4 && (
-          <div className="space-y-4">
+          <div className="space-y-4 animate-fade-in">
             <h2 className="text-lg font-bold text-gray-900">Requirements</h2>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Workers Needed
-              </label>
+            <div className="space-y-2">
+              <Label>Workers Needed</Label>
               <div className="relative">
-                <Users className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
+                <Users className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Input
                   type="number"
                   min="1"
                   value={form.workersNeeded}
                   onChange={(e) => updateForm('workersNeeded', e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:border-primary"
+                  className="pl-11 h-12 bg-white"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Estimated Duration
-              </label>
-              <input
-                type="text"
+            <div className="space-y-2">
+              <Label>Estimated Duration</Label>
+              <Input
                 placeholder="e.g., 4 hours, 2 days, 1 week"
                 value={form.duration}
                 onChange={(e) => updateForm('duration', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:border-primary"
+                className="h-12 bg-white"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Skills Required
-              </label>
+            <div className="space-y-2">
+              <Label>Skills Required</Label>
               <div className="flex gap-2">
-                <input
-                  type="text"
+                <Input
                   placeholder="Add a skill"
                   value={skillInput}
                   onChange={(e) => setSkillInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addSkill(); } }}
-                  className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-sm focus:border-primary"
+                  className="flex-1 h-12 bg-white"
                 />
-                <button
-                  onClick={addSkill}
-                  className="px-4 py-3 bg-primary text-white rounded-xl text-sm font-medium"
-                >
+                <Button onClick={addSkill} size="lg" className="rounded-xl">
                   Add
-                </button>
+                </Button>
               </div>
               {form.skillsRequired.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-3">
                   {form.skillsRequired.map((skill) => (
                     <span
                       key={skill}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-light text-primary rounded-full text-xs font-medium"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full text-xs font-medium"
                     >
                       {skill}
-                      <button onClick={() => removeSkill(skill)} className="hover:text-red-500">
+                      <button onClick={() => removeSkill(skill)} className="hover:text-red-500 transition-colors">
                         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -396,9 +389,9 @@ export default function PostJobPage() {
             </div>
 
             {/* Preview */}
-            <div className="bg-gray-50 rounded-2xl p-4 space-y-3 mt-6">
+            <div className="bg-gray-50 rounded-2xl p-5 space-y-3 mt-2 border border-gray-100">
               <h3 className="text-sm font-bold text-gray-900">Job Preview</h3>
-              <div className="space-y-2 text-sm">
+              <div className="space-y-2.5 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-500">Category</span>
                   <span className="font-medium">{CATEGORY_ICONS[form.category as WorkerCategory]} {form.category}</span>
@@ -435,40 +428,71 @@ export default function PostJobPage() {
         )}
 
         {/* Navigation Buttons */}
-        <div className="flex gap-3 pt-2">
+        <div className="flex gap-3 pt-2 pb-4">
           {currentStep > 0 && (
-            <button
+            <Button
+              variant="outline"
               onClick={() => setCurrentStep((prev) => prev - 1)}
-              className="flex-1 border border-gray-200 text-gray-700 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2"
+              className="flex-1 h-12 rounded-xl font-semibold text-sm"
             >
-              <ArrowLeft className="w-4 h-4" /> Back
-            </button>
+              <ArrowLeft className="w-4 h-4 mr-2" /> Back
+            </Button>
           )}
           {currentStep < steps.length - 1 ? (
-            <button
+            <Button
               onClick={() => setCurrentStep((prev) => prev + 1)}
               disabled={!canProceed()}
-              className="flex-1 bg-primary hover:bg-primary-hover text-white py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-colors disabled:opacity-40"
+              className="flex-1 h-12 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-semibold text-sm shadow-lg shadow-blue-600/25"
             >
-              Next <ArrowRight className="w-4 h-4" />
-            </button>
+              Next <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
           ) : (
-            <button
+            <Button
               onClick={handlePost}
               disabled={loading || !canProceed()}
-              className="flex-1 bg-primary hover:bg-primary-hover text-white py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-colors disabled:opacity-60"
+              className="flex-1 h-12 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-semibold text-sm shadow-lg shadow-blue-600/25"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
                 <>
-                  <Check className="w-4 h-4" /> Post Job
+                  <Check className="w-4 h-4 mr-2" /> Post Job
                 </>
               )}
-            </button>
+            </Button>
           )}
         </div>
       </div>
+
+      {/* Success Dialog */}
+      <Dialog open={showSuccess} onOpenChange={setShowSuccess}>
+        <DialogHeader className="text-center">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Check className="w-8 h-8 text-green-600" />
+          </div>
+          <DialogTitle className="text-center text-xl">Job Posted Successfully!</DialogTitle>
+          <DialogDescription className="text-center mt-2">
+            Your job has been posted and workers will start bidding soon. You&apos;ll receive notifications for new bids.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogContent>
+          <div className="space-y-3">
+            <Button
+              onClick={() => { setShowSuccess(false); router.push('/dashboard/my-bookings'); }}
+              className="w-full h-12 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold"
+            >
+              View My Bookings
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => { setShowSuccess(false); router.push('/dashboard'); }}
+              className="w-full h-12 rounded-xl font-semibold"
+            >
+              Back to Dashboard
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

@@ -18,11 +18,16 @@ import {
 import Header from '@/components/layout/Header';
 import { mockEmployer, mockJobs } from '@/lib/mock-data';
 import { formatPKR, getInitials } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Dialog, DialogHeader, DialogTitle, DialogContent } from '@/components/ui/dialog';
 
 export default function ProfilePage() {
   const router = useRouter();
   const employer = mockEmployer;
   const [editing, setEditing] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const completedJobs = mockJobs.filter((j) => j.status === 'completed').length;
   const activeJobs = mockJobs.filter((j) => j.status === 'open' || j.status === 'in_progress').length;
@@ -45,12 +50,12 @@ export default function ProfilePage() {
       <Header title="Profile" showBack />
       <div className="px-4 py-4 space-y-4">
         {/* Profile Card */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 animate-fade-in">
           <div className="flex items-start gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-primary text-white flex items-center justify-center text-lg font-bold flex-shrink-0">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 text-white flex items-center justify-center text-lg font-bold flex-shrink-0 shadow-lg shadow-blue-600/20">
               {getInitials(employer.name)}
             </div>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <h2 className="text-lg font-bold text-gray-900">{employer.name}</h2>
               {employer.company_name && (
                 <p className="text-sm text-gray-500 flex items-center gap-1 mt-0.5">
@@ -70,84 +75,69 @@ export default function ProfilePage() {
 
           {/* Stats */}
           <div className="grid grid-cols-4 gap-2 mt-5">
-            <div className="text-center p-2.5 bg-gray-50 rounded-xl">
+            <div className="text-center p-3 bg-gray-50 rounded-xl">
               <p className="text-base font-bold text-gray-900">{mockJobs.length}</p>
-              <p className="text-[10px] text-gray-500 mt-0.5">Total</p>
+              <p className="text-[10px] text-gray-500 mt-0.5 font-medium">Total</p>
             </div>
-            <div className="text-center p-2.5 bg-blue-50 rounded-xl">
+            <div className="text-center p-3 bg-blue-50 rounded-xl">
               <p className="text-base font-bold text-primary">{activeJobs}</p>
-              <p className="text-[10px] text-gray-500 mt-0.5">Active</p>
+              <p className="text-[10px] text-gray-500 mt-0.5 font-medium">Active</p>
             </div>
-            <div className="text-center p-2.5 bg-green-50 rounded-xl">
+            <div className="text-center p-3 bg-green-50 rounded-xl">
               <p className="text-base font-bold text-green-600">{completedJobs}</p>
-              <p className="text-[10px] text-gray-500 mt-0.5">Done</p>
+              <p className="text-[10px] text-gray-500 mt-0.5 font-medium">Done</p>
             </div>
-            <div className="text-center p-2.5 bg-amber-50 rounded-xl">
+            <div className="text-center p-3 bg-amber-50 rounded-xl">
               <p className="text-base font-bold text-amber-600">{employer.avg_rating_given}</p>
-              <p className="text-[10px] text-gray-500 mt-0.5">Rating</p>
+              <p className="text-[10px] text-gray-500 mt-0.5 font-medium">Rating</p>
             </div>
           </div>
         </div>
 
         {/* Edit Profile */}
         {editing ? (
-          <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 space-y-4">
+          <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 space-y-4 animate-fade-in">
             <h3 className="text-sm font-bold text-gray-900">Edit Profile</h3>
-            <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1.5">Full Name</label>
-              <input
-                type="text"
-                defaultValue={employer.name}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:border-primary"
-              />
+            <div className="space-y-2">
+              <Label className="text-xs">Full Name</Label>
+              <Input defaultValue={employer.name} className="h-11" />
             </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1.5">Email</label>
-              <input
-                type="email"
-                defaultValue={employer.email}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:border-primary"
-              />
+            <div className="space-y-2">
+              <Label className="text-xs">Email</Label>
+              <Input type="email" defaultValue={employer.email} className="h-11" />
             </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1.5">Phone</label>
-              <input
-                type="tel"
-                defaultValue={employer.phone}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:border-primary"
-              />
+            <div className="space-y-2">
+              <Label className="text-xs">Phone</Label>
+              <Input type="tel" defaultValue={employer.phone} className="h-11" />
             </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1.5">Company Name</label>
-              <input
-                type="text"
-                defaultValue={employer.company_name || ''}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:border-primary"
-              />
+            <div className="space-y-2">
+              <Label className="text-xs">Company Name</Label>
+              <Input defaultValue={employer.company_name || ''} className="h-11" />
             </div>
-            <div className="flex gap-2">
-              <button
+            <div className="flex gap-3 pt-2">
+              <Button
                 onClick={() => setEditing(false)}
-                className="flex-1 bg-primary text-white py-2.5 rounded-xl text-sm font-semibold"
+                className="flex-1 h-11 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold shadow-lg shadow-blue-600/25"
               >
                 Save Changes
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="outline"
                 onClick={() => setEditing(false)}
-                className="px-6 border border-gray-200 text-gray-600 py-2.5 rounded-xl text-sm font-semibold"
+                className="h-11"
               >
                 Cancel
-              </button>
+              </Button>
             </div>
           </div>
         ) : (
           <button
             onClick={() => setEditing(true)}
-            className="w-full bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center justify-between hover:border-primary/30 transition-colors"
+            className="w-full bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center justify-between hover:border-blue-200 transition-all active:scale-[0.99] animate-fade-in animate-delay-100"
           >
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-primary-light flex items-center justify-center">
-                <Edit3 className="w-4 h-4 text-primary" />
+              <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                <Edit3 className="w-5 h-5 text-blue-600" />
               </div>
               <span className="text-sm font-semibold text-gray-900">Edit Profile</span>
             </div>
@@ -156,45 +146,75 @@ export default function ProfilePage() {
         )}
 
         {/* Menu Items */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-50">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-50 animate-fade-in animate-delay-200">
           {menuItems.map((item) => {
             const Icon = item.icon;
             return (
-              <a
+              <button
                 key={item.label}
-                href={item.href}
-                className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+                onClick={() => { if (item.href !== '#') router.push(item.href); }}
+                className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors active:scale-[0.99]"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center">
-                    <Icon className="w-4 h-4 text-gray-600" />
+                  <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center">
+                    <Icon className="w-5 h-5 text-gray-600" />
                   </div>
                   <span className="text-sm font-medium text-gray-900">{item.label}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   {item.value && (
-                    <span className="text-xs text-gray-400">{item.value}</span>
+                    <span className="text-xs text-gray-400 font-medium">{item.value}</span>
                   )}
                   <ChevronRight className="w-4 h-4 text-gray-400" />
                 </div>
-              </a>
+              </button>
             );
           })}
         </div>
 
         {/* Logout */}
         <button
-          onClick={handleLogout}
-          className="w-full bg-white rounded-2xl p-4 shadow-sm border border-red-100 flex items-center justify-center gap-2 hover:bg-red-50 transition-colors text-red-600"
+          onClick={() => setShowLogoutDialog(true)}
+          className="w-full bg-white rounded-2xl p-4 shadow-sm border border-red-100 flex items-center justify-center gap-2 hover:bg-red-50 transition-colors text-red-600 active:scale-[0.99] animate-fade-in animate-delay-300"
         >
           <LogOut className="w-4 h-4" />
           <span className="text-sm font-semibold">Log Out</span>
         </button>
 
-        <p className="text-center text-xs text-gray-400 pb-4">
+        <p className="text-center text-xs text-gray-400 pb-4 pt-2">
           MazdoorPing Employer App v1.0.0
         </p>
       </div>
+
+      {/* Logout Dialog */}
+      <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <DialogHeader className="text-center">
+          <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <LogOut className="w-7 h-7 text-red-600" />
+          </div>
+          <DialogTitle className="text-center text-lg">Log Out?</DialogTitle>
+          <p className="text-sm text-gray-500 text-center mt-2">
+            Are you sure you want to log out of your account?
+          </p>
+        </DialogHeader>
+        <DialogContent>
+          <div className="space-y-3">
+            <Button
+              onClick={handleLogout}
+              className="w-full h-12 bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold shadow-lg shadow-red-500/25"
+            >
+              Log Out
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setShowLogoutDialog(false)}
+              className="w-full h-12 rounded-xl font-semibold"
+            >
+              Cancel
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

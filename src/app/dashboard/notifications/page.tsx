@@ -62,14 +62,14 @@ export default function NotificationsPage() {
                 key={f}
                 onClick={() => setFilter(f)}
                 className={cn(
-                  'px-4 py-2 rounded-full text-xs font-semibold transition-colors',
+                  'px-4 py-2.5 rounded-full text-xs font-semibold transition-all active:scale-95',
                   filter === f
-                    ? 'bg-primary text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ? 'bg-primary text-white shadow-sm shadow-blue-200'
+                    : 'bg-white text-gray-600 border border-gray-200 hover:border-blue-200'
                 )}
               >
                 {f === 'all' ? 'All' : 'Unread'}
-                <span className="ml-1.5">
+                <span className="ml-1.5 opacity-80">
                   {f === 'all'
                     ? notifications.length
                     : notifications.filter((n) => !n.read).length}
@@ -80,7 +80,7 @@ export default function NotificationsPage() {
           {notifications.some((n) => !n.read) && (
             <button
               onClick={markAllRead}
-              className="text-xs text-primary font-medium flex items-center gap-1"
+              className="text-xs text-primary font-semibold flex items-center gap-1"
             >
               <CheckCheck className="w-3.5 h-3.5" /> Mark all read
             </button>
@@ -99,15 +99,15 @@ export default function NotificationsPage() {
                   key={notification.id}
                   onClick={() => markAsRead(notification.id)}
                   className={cn(
-                    'w-full text-left bg-white rounded-2xl p-4 shadow-sm border transition-colors',
+                    'w-full text-left bg-white rounded-2xl p-4 shadow-sm border transition-all active:scale-[0.99]',
                     notification.read
                       ? 'border-gray-100'
-                      : 'border-primary/20 bg-primary-light/30'
+                      : 'border-blue-100 bg-blue-50/30'
                   )}
                 >
                   <div className="flex items-start gap-3">
-                    <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0', colorClass)}>
-                      <Icon className="w-4 h-4" />
+                    <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0', colorClass)}>
+                      <Icon className="w-5 h-5" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
@@ -118,11 +118,11 @@ export default function NotificationsPage() {
                           {notification.title}
                         </h3>
                         {!notification.read && (
-                          <span className="w-2 h-2 rounded-full bg-primary flex-shrink-0 mt-1.5" />
+                          <span className="w-2.5 h-2.5 rounded-full bg-primary flex-shrink-0 mt-1" />
                         )}
                       </div>
-                      <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{notification.message}</p>
-                      <p className="text-[10px] text-gray-400 mt-1.5">{formatRelativeTime(notification.created_at)}</p>
+                      <p className="text-xs text-gray-500 mt-1 line-clamp-2 leading-relaxed">{notification.message}</p>
+                      <p className="text-[10px] text-gray-400 mt-2 font-medium">{formatRelativeTime(notification.created_at)}</p>
                     </div>
                   </div>
                 </button>
@@ -130,9 +130,11 @@ export default function NotificationsPage() {
             })}
           </div>
         ) : (
-          <div className="text-center py-12">
-            <Bell className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <h3 className="text-base font-semibold text-gray-900">
+          <div className="text-center py-16">
+            <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Bell className="w-8 h-8 text-gray-300" />
+            </div>
+            <h3 className="text-base font-bold text-gray-900">
               {filter === 'unread' ? 'No unread notifications' : 'No notifications'}
             </h3>
             <p className="text-sm text-gray-500 mt-1">
