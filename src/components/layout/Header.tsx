@@ -1,26 +1,21 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { useRouter } from 'next/navigation';
-import { Bell, ChevronLeft } from 'lucide-react';
-import { getInitials } from '@/lib/utils';
+import React from 'react'
+import { useRouter } from 'next/navigation'
+import { Bell, ChevronLeft } from 'lucide-react'
+import { useAuth } from '@/components/auth/AuthProvider'
+import { getInitials } from '@/lib/utils'
 
 interface HeaderProps {
-  title?: string;
-  showBack?: boolean;
-  showNotifications?: boolean;
+  title?: string
+  showBack?: boolean
+  showNotifications?: boolean
 }
 
 export default function Header({ title, showBack, showNotifications = true }: HeaderProps) {
-  const router = useRouter();
-  const [userName, setUserName] = React.useState('Employer');
-
-  React.useEffect(() => {
-    try {
-      const user = JSON.parse(localStorage.getItem('mazdoorping_user') || '{}');
-      if (user.name) setUserName(user.name);
-    } catch {}
-  }, []);
+  const router = useRouter()
+  const { employerProfile } = useAuth()
+  const userName = employerProfile?.full_name || 'Employer'
 
   return (
     <header className="sticky top-0 bg-white/80 backdrop-blur-xl z-40 border-b border-gray-100/80">
@@ -56,13 +51,10 @@ export default function Header({ title, showBack, showNotifications = true }: He
               className="relative w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors active:scale-95"
             >
               <Bell className="w-5 h-5 text-gray-600" />
-              <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-sm">
-                2
-              </span>
             </button>
           )}
         </div>
       </div>
     </header>
-  );
+  )
 }

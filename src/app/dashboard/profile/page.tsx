@@ -1,49 +1,85 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import {
-  Phone,
-  MapPin,
-  Building2,
-  Edit3,
-  Star,
-  Briefcase,
-  DollarSign,
-  Heart,
-  ChevronRight,
-  LogOut,
-  Shield,
-} from 'lucide-react';
-import Header from '@/components/layout/Header';
-import { mockEmployer, mockJobs } from '@/lib/mock-data';
-import { formatPKR, getInitials } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Dialog, DialogHeader, DialogTitle, DialogContent } from '@/components/ui/dialog';
+  Phone, MapPin, Building2, Edit3, Star, Briefcase, DollarSign,
+  Heart, ChevronRight, LogOut, Shield, Check, Loader2,
+} from 'lucide-react'
+import Header from '@/components/layout/Header'
+import { useAuth } from '@/components/auth/AuthProvider'
+import { signOut, updateEmployerProfile, getMyJobs } from '@/lib/services'
+import { formatPKR, getInitials } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Dialog, DialogHeader, DialogTitle, DialogContent } from '@/components/ui/dialog'
+import type { Job } from '@/types'
 
 export default function ProfilePage() {
-  const router = useRouter();
-  const employer = mockEmployer;
-  const [editing, setEditing] = useState(false);
-  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const router = useRouter()
+  const { employerProfile, session } = useAuth()
+  const [editing, setEditing] = useState(false)
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false)
+  const [jobs, setJobs] = useState<Job[]>([])
+  const [saving, setSaving] = useState(false)
 
-  const completedJobs = mockJobs.filter((j) => j.status === 'completed').length;
-  const activeJobs = mockJobs.filter((j) => j.status === 'open' || j.status === 'in_progress').length;
+  const [editForm, setEditForm] = useState({
+    name: employerProfile?.full_name || '',
+    phone: employerProfile?.phone || '',
+    city: employerProfile?.city || '',
+    companyName: employerProfile?.company_name || '',
+  })
+
+  useState(() => {
+    const fetchJobs = async () => {
+      if (employerProfile) {
+        const data = await getMyJobs(employerProfile.id)
+        setJobs(data)
+      }
+    }
+    fetchJobs()
+  })
+
+  const completedJobs = jobs.filter((j) => j.status === 'completed').length
+  const activeJobs = jobs.filter((j) => j.status === 'open' || j.status === 'in_progress').length
 
   const menuItems = [
-    { icon: Briefcase, label: 'My Bookings', value: `${mockJobs.length} jobs`, href: '/dashboard/my-bookings' },
-    { icon: Heart, label: 'Saved Workers', value: `${employer.saved_workers_count} workers`, href: '/dashboard/favorites' },
-    { icon: Star, label: 'Reviews Given', value: `${employer.avg_rating_given} avg`, href: '#' },
-    { icon: DollarSign, label: 'Spending Summary', value: formatPKR(employer.total_spent), href: '#' },
+    { icon: Briefcase, label: 'My Bookings', value: `${jobs.length} jobs`, href: '/dashboard/my-bookings' },
+    { icon: Heart, label: 'Saved Workers', value: `${employerProfile?.saved_workers_count || 0} workers`, href: '/dashboard/favorites' },
+    { icon: Star, label: 'Rating', value: `${(employerProfile?.rating || 0).toFixed(1)} avg`, href: '#' },
+    { icon: DollarSign, label: 'Spending Summary', value: formatPKR(employerProfile?.total_spent || 0), href: '#' },
     { icon: Shield, label: 'Privacy & Settings', value: '', href: '#' },
-  ];
+  ]
 
-  const handleLogout = () => {
-    localStorage.removeItem('mazdoorping_user');
-    router.push('/login');
-  };
+  const handleSaveProfile = async () => {
+    if (!employerProfile) return
+    setSaving(true)
+    await updateEmployerProfile(employerProfile.id, {
+      full_name: editForm.name,
+      phone: editForm.phone,
+      city: editForm.city,
+      company_name: editForm.companyName,
+    })
+    setSaving(false)
+    setEditing(false)
+  }
+
+  const handleLogout = async () => {
+    await signOut()
+    router.push('/login')
+  }
+
+  if (!employerProfile) {
+    return (
+      <>
+        <Header title="Profile" showBack />
+        <div className="px-4 py-12 text-center">
+          <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto" />
+        </div>
+      </>
+    )
+  }
 
   return (
     <>
@@ -53,30 +89,32 @@ export default function ProfilePage() {
         <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 animate-fade-in">
           <div className="flex items-start gap-4">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 text-white flex items-center justify-center text-lg font-bold flex-shrink-0 shadow-lg shadow-blue-600/20">
-              {getInitials(employer.name)}
+              {getInitials(employerProfile.full_name)}
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="text-lg font-bold text-gray-900">{employer.name}</h2>
-              {employer.company_name && (
+              <h2 className="text-lg font-bold text-gray-900">{employerProfile.full_name}</h2>
+              {employerProfile.company_name && (
                 <p className="text-sm text-gray-500 flex items-center gap-1 mt-0.5">
-                  <Building2 className="w-3.5 h-3.5" /> {employer.company_name}
+                  <Building2 className="w-3.5 h-3.5" /> {employerProfile.company_name}
                 </p>
               )}
               <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
                 <span className="flex items-center gap-1">
-                  <MapPin className="w-3 h-3" /> {employer.city}
+                  <MapPin className="w-3 h-3" /> {employerProfile.city}
                 </span>
-                <span className="flex items-center gap-1">
-                  <Phone className="w-3 h-3" /> {employer.phone}
-                </span>
+                {employerProfile.phone && (
+                  <span className="flex items-center gap-1">
+                    <Phone className="w-3 h-3" /> {employerProfile.phone}
+                  </span>
+                )}
               </div>
+              <p className="text-xs text-gray-400 mt-1">{session?.user?.email}</p>
             </div>
           </div>
 
-          {/* Stats */}
           <div className="grid grid-cols-4 gap-2 mt-5">
             <div className="text-center p-3 bg-gray-50 rounded-xl">
-              <p className="text-base font-bold text-gray-900">{mockJobs.length}</p>
+              <p className="text-base font-bold text-gray-900">{jobs.length}</p>
               <p className="text-[10px] text-gray-500 mt-0.5 font-medium">Total</p>
             </div>
             <div className="text-center p-3 bg-blue-50 rounded-xl">
@@ -88,7 +126,7 @@ export default function ProfilePage() {
               <p className="text-[10px] text-gray-500 mt-0.5 font-medium">Done</p>
             </div>
             <div className="text-center p-3 bg-amber-50 rounded-xl">
-              <p className="text-base font-bold text-amber-600">{employer.avg_rating_given}</p>
+              <p className="text-base font-bold text-amber-600">{(employerProfile.rating || 0).toFixed(1)}</p>
               <p className="text-[10px] text-gray-500 mt-0.5 font-medium">Rating</p>
             </div>
           </div>
@@ -100,39 +138,43 @@ export default function ProfilePage() {
             <h3 className="text-sm font-bold text-gray-900">Edit Profile</h3>
             <div className="space-y-2">
               <Label className="text-xs">Full Name</Label>
-              <Input defaultValue={employer.name} className="h-11" />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-xs">Email</Label>
-              <Input type="email" defaultValue={employer.email} className="h-11" />
+              <Input value={editForm.name} onChange={(e) => setEditForm((p) => ({ ...p, name: e.target.value }))} className="h-11" />
             </div>
             <div className="space-y-2">
               <Label className="text-xs">Phone</Label>
-              <Input type="tel" defaultValue={employer.phone} className="h-11" />
+              <Input value={editForm.phone} onChange={(e) => setEditForm((p) => ({ ...p, phone: e.target.value }))} className="h-11" />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs">City</Label>
+              <Input value={editForm.city} onChange={(e) => setEditForm((p) => ({ ...p, city: e.target.value }))} className="h-11" />
             </div>
             <div className="space-y-2">
               <Label className="text-xs">Company Name</Label>
-              <Input defaultValue={employer.company_name || ''} className="h-11" />
+              <Input value={editForm.companyName} onChange={(e) => setEditForm((p) => ({ ...p, companyName: e.target.value }))} className="h-11" />
             </div>
             <div className="flex gap-3 pt-2">
               <Button
-                onClick={() => setEditing(false)}
+                onClick={handleSaveProfile}
+                disabled={saving}
                 className="flex-1 h-11 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold shadow-lg shadow-blue-600/25"
               >
+                {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Check className="w-4 h-4 mr-2" />}
                 Save Changes
               </Button>
-              <Button
-                variant="outline"
-                onClick={() => setEditing(false)}
-                className="h-11"
-              >
-                Cancel
-              </Button>
+              <Button variant="outline" onClick={() => setEditing(false)} className="h-11">Cancel</Button>
             </div>
           </div>
         ) : (
           <button
-            onClick={() => setEditing(true)}
+            onClick={() => {
+              setEditForm({
+                name: employerProfile.full_name,
+                phone: employerProfile.phone || '',
+                city: employerProfile.city,
+                companyName: employerProfile.company_name || '',
+              })
+              setEditing(true)
+            }}
             className="w-full bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center justify-between hover:border-blue-200 transition-all active:scale-[0.99] animate-fade-in animate-delay-100"
           >
             <div className="flex items-center gap-3">
@@ -148,11 +190,11 @@ export default function ProfilePage() {
         {/* Menu Items */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-50 animate-fade-in animate-delay-200">
           {menuItems.map((item) => {
-            const Icon = item.icon;
+            const Icon = item.icon
             return (
               <button
                 key={item.label}
-                onClick={() => { if (item.href !== '#') router.push(item.href); }}
+                onClick={() => { if (item.href !== '#') router.push(item.href) }}
                 className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors active:scale-[0.99]"
               >
                 <div className="flex items-center gap-3">
@@ -162,13 +204,11 @@ export default function ProfilePage() {
                   <span className="text-sm font-medium text-gray-900">{item.label}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  {item.value && (
-                    <span className="text-xs text-gray-400 font-medium">{item.value}</span>
-                  )}
+                  {item.value && <span className="text-xs text-gray-400 font-medium">{item.value}</span>}
                   <ChevronRight className="w-4 h-4 text-gray-400" />
                 </div>
               </button>
-            );
+            )
           })}
         </div>
 
@@ -181,12 +221,9 @@ export default function ProfilePage() {
           <span className="text-sm font-semibold">Log Out</span>
         </button>
 
-        <p className="text-center text-xs text-gray-400 pb-4 pt-2">
-          MazdoorPing Employer App v1.0.0
-        </p>
+        <p className="text-center text-xs text-gray-400 pb-4 pt-2">MazdoorPing Employer App v1.0.0</p>
       </div>
 
-      {/* Logout Dialog */}
       <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
         <DialogHeader className="text-center">
           <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -216,5 +253,5 @@ export default function ProfilePage() {
         </DialogContent>
       </Dialog>
     </>
-  );
+  )
 }

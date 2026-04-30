@@ -1,15 +1,15 @@
-'use client';
+'use client'
 
-import Link from 'next/link';
-import { Star, MapPin, Briefcase, Heart } from 'lucide-react';
-import { cn, formatPKR, getInitials } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
-import type { Worker } from '@/types';
+import Link from 'next/link'
+import { Star, MapPin, Briefcase, Heart } from 'lucide-react'
+import { cn, formatPKR, getInitials } from '@/lib/utils'
+import { Badge } from '@/components/ui/badge'
+import type { Worker } from '@/types'
 
 interface WorkerCardProps {
-  worker: Worker;
-  isSaved?: boolean;
-  onSave?: (id: string) => void;
+  worker: Worker
+  isSaved?: boolean
+  onSave?: (id: string) => void
 }
 
 export default function WorkerCard({ worker, isSaved, onSave }: WorkerCardProps) {
@@ -19,21 +19,21 @@ export default function WorkerCard({ worker, isSaved, onSave }: WorkerCardProps)
         <div className="flex items-start gap-3.5">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold flex-shrink-0 group-hover:scale-105 transition-transform">
             {worker.avatar_url ? (
-              <img src={worker.avatar_url} alt={worker.name} className="w-full h-full rounded-xl object-cover" />
+              <img src={worker.avatar_url} alt={worker.full_name} className="w-full h-full rounded-xl object-cover" />
             ) : (
-              getInitials(worker.name)
+              getInitials(worker.full_name)
             )}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-gray-900 truncate">{worker.name}</h3>
+              <h3 className="text-sm font-semibold text-gray-900 truncate">{worker.full_name}</h3>
               <div className="flex items-center gap-1.5">
                 {isSaved !== undefined && (
                   <button
                     onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      onSave?.(worker.id);
+                      e.preventDefault()
+                      e.stopPropagation()
+                      onSave?.(worker.id)
                     }}
                     className="transition-transform active:scale-90"
                   >
@@ -42,10 +42,10 @@ export default function WorkerCard({ worker, isSaved, onSave }: WorkerCardProps)
                 )}
               </div>
             </div>
-            <p className="text-xs text-gray-500 mt-0.5">{worker.category}</p>
+            <p className="text-xs text-gray-500 mt-0.5">{worker.category?.name || 'Worker'}</p>
             <div className="flex items-center gap-1 mt-1.5">
               <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-              <span className="text-xs font-bold text-gray-800">{worker.rating}</span>
+              <span className="text-xs font-bold text-gray-800">{Number(worker.rating).toFixed(1)}</span>
               <span className="text-xs text-gray-400">({worker.total_reviews})</span>
               <span className="text-gray-300 mx-0.5">|</span>
               <span className="text-xs text-gray-500">{worker.experience_years}yr exp</span>
@@ -59,7 +59,7 @@ export default function WorkerCard({ worker, isSaved, onSave }: WorkerCardProps)
               <MapPin className="w-3 h-3" /> {worker.city}
             </span>
             <span className="flex items-center gap-1">
-              <Briefcase className="w-3 h-3" /> {worker.completed_jobs}
+              <Briefcase className="w-3 h-3" /> {worker.total_jobs}
             </span>
           </div>
           <Badge variant={worker.is_available ? "success" : "secondary"} className="text-[10px]">
@@ -69,16 +69,12 @@ export default function WorkerCard({ worker, isSaved, onSave }: WorkerCardProps)
 
         <div className="flex items-center justify-between mt-2.5">
           <div className="flex items-center gap-3">
-            <span className="text-sm font-bold text-primary">{formatPKR(worker.hourly_rate)}</span>
-            <span className="text-xs text-gray-400">/hr</span>
-            <span className="text-gray-200">|</span>
-            <span className="text-sm font-semibold text-gray-700">{formatPKR(worker.daily_rate)}</span>
-            <span className="text-xs text-gray-400">/day</span>
+            <span className="text-sm font-bold text-primary">{formatPKR(worker.base_rate)}</span>
+            <span className="text-xs text-gray-400">base rate</span>
           </div>
         </div>
 
-        {/* Skills tags (max 3) */}
-        {worker.skills.length > 0 && (
+        {worker.skills && worker.skills.length > 0 && (
           <div className="flex gap-1.5 mt-3 overflow-hidden">
             {worker.skills.slice(0, 3).map((skill) => (
               <span
@@ -97,5 +93,5 @@ export default function WorkerCard({ worker, isSaved, onSave }: WorkerCardProps)
         )}
       </div>
     </Link>
-  );
+  )
 }

@@ -1,19 +1,47 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { Heart, Trash2 } from 'lucide-react';
-import Header from '@/components/layout/Header';
-import WorkerCard from '@/components/workers/WorkerCard';
-import { mockWorkers, mockSavedWorkerIds } from '@/lib/mock-data';
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { Heart, Trash2 } from 'lucide-react'
+import Header from '@/components/layout/Header'
+import WorkerCard from '@/components/workers/WorkerCard'
+import { useAuth } from '@/components/auth/AuthProvider'
+import { getSavedWorkers, saveWorker } from '@/lib/services'
+import type { Worker } from '@/types'
 
 export default function FavoritesPage() {
-  const [savedIds, setSavedIds] = useState<string[]>(mockSavedWorkerIds);
-  const savedWorkers = mockWorkers.filter((w) => savedIds.includes(w.id));
+  const { employerProfile } = useAuth()
+  const [savedWorkers, setSavedWorkers] = useState<Worker[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const handleRemove = (workerId: string) => {
-    setSavedIds((prev) => prev.filter((id) => id !== workerId));
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!employerProfile) return
+      const data = await getSavedWorkers(employerProfile.id)
+      setSavedWorkers(data)
+      setLoading(false)
+    }
+    fetchData()
+  }, [employerProfile])
+
+  const handleRemove = async (workerId: string) => {
+    if (!employerProfile) return
+    await saveWorker(employerProfile.id, workerId)
+    setSavedWorkers((prev) => prev.filter((w) => w.id !== workerId))
+  }
+
+  if (loading) {
+    return (
+      <>
+        <Header title="Saved Workers" showBack />
+        <div className="px-4 py-4 space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-white rounded-2xl p-4 h-32 animate-pulse" />
+          ))}
+        </div>
+      </>
+    )
+  }
 
   return (
     <>
@@ -32,8 +60,8 @@ export default function FavoritesPage() {
                 <WorkerCard worker={worker} isSaved onSave={handleRemove} />
                 <button
                   onClick={(e) => {
-                    e.preventDefault();
-                    handleRemove(worker.id);
+                    e.preventDefault()
+                    handleRemove(worker.id)
                   }}
                   className="absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-xl bg-red-50 text-red-400 hover:bg-red-100 hover:text-red-600 transition-colors z-10 active:scale-95"
                 >
@@ -61,5 +89,5 @@ export default function FavoritesPage() {
         )}
       </div>
     </>
-  );
+  )
 }

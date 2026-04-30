@@ -31,7 +31,7 @@ export const WORKER_CATEGORIES: WorkerCategory[] = [
   'Locksmith',
 ];
 
-export const CATEGORY_ICONS: Record<WorkerCategory, string> = {
+export const CATEGORY_ICONS: Record<string, string> = {
   Plumber: '🔧',
   Electrician: '⚡',
   Carpenter: '🪚',
@@ -42,7 +42,7 @@ export const CATEGORY_ICONS: Record<WorkerCategory, string> = {
   Cleaner: '🧹',
   Driver: '🚗',
   Laborer: '👷',
-  Gardener: '🌱',
+  Gardener: '🌿',
   Tailor: '🧵',
   Mechanic: '🔩',
   Locksmith: '🔑',
@@ -91,84 +91,125 @@ export const BUSINESS_TYPES: { value: BusinessType; label: string }[] = [
 ];
 
 export type BudgetType = 'hourly' | 'daily' | 'fixed' | 'negotiable';
-export type JobStatus = 'open' | 'in_progress' | 'completed' | 'cancelled';
-export type UrgencyLevel = 'normal' | 'urgent' | 'very_urgent';
+export type JobStatus = 'open' | 'in_progress' | 'completed' | 'cancelled' | 'disputed';
+export type UrgencyLevel = 'normal' | 'urgent' | 'emergency';
 
-export interface User {
+// Supabase-aligned types
+export interface Category {
   id: string;
-  email: string;
-  phone: string;
   name: string;
-  city: string;
-  company_name?: string;
-  business_type?: BusinessType;
-  role: 'employer' | 'worker';
-  avatar_url?: string;
+  name_ur: string | null;
+  icon: string | null;
+  description: string | null;
+  base_rate: number;
+  commission_rate: number;
+  is_active: boolean;
+  total_workers: number;
   created_at: string;
+  updated_at: string;
 }
 
-export interface EmployerProfile extends User {
-  role: 'employer';
+export interface EmployerProfile {
+  id: string;
+  full_name: string;
+  phone: string | null;
+  email: string | null;
+  avatar_url: string | null;
+  role: string;
+  company_name: string | null;
+  business_type: string | null;
+  city: string;
+  area: string | null;
+  rating: number;
+  total_reviews: number;
+  total_jobs_posted: number;
   total_spent: number;
-  jobs_posted: number;
-  avg_rating_given: number;
-  saved_workers_count: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  saved_workers_count?: number;
 }
 
 export interface Worker {
   id: string;
-  name: string;
-  category: WorkerCategory;
+  full_name: string;
+  category_id: string | null;
+  category?: Category;
   city: string;
-  area?: string;
+  area: string | null;
+  bio: string | null;
+  experience_years: number;
   rating: number;
   total_reviews: number;
-  experience_years: number;
-  hourly_rate: number;
-  daily_rate: number;
-  avatar_url?: string;
-  phone?: string;
-  bio?: string;
-  skills: string[];
+  total_jobs: number;
+  total_earnings: number;
+  base_rate: number;
+  status: string;
+  is_verified: boolean;
   is_available: boolean;
-  completed_jobs: number;
+  latitude: number | null;
+  longitude: number | null;
+  avatar_url?: string | null;
+  phone?: string | null;
+  skills: string[];
   created_at: string;
+  updated_at: string;
 }
 
 export interface Job {
   id: string;
   employer_id: string;
-  employer_name: string;
-  category: WorkerCategory;
+  worker_id: string | null;
+  category_id: string;
+  category?: Category;
   title: string;
-  description: string;
+  description: string | null;
   budget_type: BudgetType;
-  budget_amount: number;
+  budget_min: number | null;
+  budget_max: number | null;
   city: string;
-  area?: string;
-  address?: string;
-  date: string;
-  time?: string;
+  area: string | null;
+  address: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  status: JobStatus;
   urgency: UrgencyLevel;
   workers_needed: number;
-  duration?: string;
-  skills_required: string[];
-  status: JobStatus;
-  accepted_bid_id?: string;
+  duration: string | null;
+  skills_required: string[] | null;
+  scheduled_date: string | null;
+  scheduled_time: string | null;
+  final_price: number | null;
+  commission: number | null;
+  completed_at: string | null;
   created_at: string;
-  bids_count: number;
+  updated_at: string;
+  bids_count?: number;
+  // Joined fields
+  employer?: { full_name: string; company_name: string | null };
+  worker?: { full_name: string; rating: number; experience_years: number; phone?: string | null };
+  bids?: Bid[];
 }
 
 export interface Bid {
   id: string;
   job_id: string;
   worker_id: string;
-  worker: Worker;
   amount: number;
-  message: string;
-  estimated_duration?: string;
+  message: string | null;
+  estimated_duration: string | null;
   status: 'pending' | 'accepted' | 'rejected';
   created_at: string;
+  // Joined
+  worker?: {
+    id: string;
+    full_name: string;
+    rating: number;
+    experience_years: number;
+    total_jobs: number;
+    avatar_url: string | null;
+    category?: Category;
+  };
 }
 
 export interface Review {
@@ -178,7 +219,7 @@ export interface Review {
   employer_id: string;
   employer_name: string;
   rating: number;
-  comment: string;
+  comment: string | null;
   is_anonymous: boolean;
   created_at: string;
 }
@@ -186,10 +227,10 @@ export interface Review {
 export interface Notification {
   id: string;
   user_id: string;
-  type: 'new_bid' | 'bid_accepted' | 'bid_rejected' | 'job_completed' | 'new_review' | 'system';
+  type: string;
   title: string;
   message: string;
-  read: boolean;
-  related_id?: string;
+  is_read: boolean;
+  data: Record<string, unknown> | null;
   created_at: string;
 }

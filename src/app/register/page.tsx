@@ -1,20 +1,21 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Mail, Lock, Phone, ArrowRight, ArrowLeft, User, Building2, MapPin, CheckCircle } from 'lucide-react';
-import { CITIES, BUSINESS_TYPES } from '@/types';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/select';
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Mail, Lock, Phone, ArrowRight, ArrowLeft, User, Building2, MapPin, CheckCircle } from 'lucide-react'
+import { CITIES, BUSINESS_TYPES } from '@/types'
+import { signUpWithEmail, createEmployerProfile } from '@/lib/services'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select } from '@/components/ui/select'
 
 export default function RegisterPage() {
-  const router = useRouter();
-  const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const router = useRouter()
+  const [step, setStep] = useState(1)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
 
   const [form, setForm] = useState({
     name: '',
@@ -25,67 +26,82 @@ export default function RegisterPage() {
     city: '',
     companyName: '',
     businessType: '',
-  });
+  })
 
   const updateForm = (field: string, value: string) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-    setError('');
-  };
+    setForm((prev) => ({ ...prev, [field]: value }))
+    setError('')
+  }
 
   const handleNext = () => {
     if (step === 1) {
       if (!form.name || !form.email || !form.phone || !form.password) {
-        setError('Please fill in all required fields');
-        return;
+        setError('Please fill in all required fields')
+        return
       }
       if (form.password !== form.confirmPassword) {
-        setError('Passwords do not match');
-        return;
+        setError('Passwords do not match')
+        return
       }
       if (form.password.length < 6) {
-        setError('Password must be at least 6 characters');
-        return;
+        setError('Password must be at least 6 characters')
+        return
       }
     }
     if (step === 2) {
       if (!form.city) {
-        setError('Please select your city');
-        return;
+        setError('Please select your city')
+        return
       }
     }
-    setStep((prev) => prev + 1);
-    setError('');
-  };
+    setStep((prev) => prev + 1)
+    setError('')
+  }
 
   const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (!agreedToTerms) {
-      setError('Please agree to the terms and conditions');
-      return;
+      setError('Please agree to the terms and conditions')
+      return
     }
-    setLoading(true);
+    setLoading(true)
+    setError('')
 
-    setTimeout(() => {
-      const mockUser = {
-        id: 'emp-new',
-        email: form.email,
-        name: form.name,
+    const { data: authData, error: authError } = await signUpWithEmail(form.email, form.password, {
+      full_name: form.name,
+      phone: form.phone,
+      role: 'employer',
+    })
+
+    if (authError) {
+      setError(authError.message)
+      setLoading(false)
+      return
+    }
+
+    if (authData.user) {
+      const { error: profileError } = await createEmployerProfile(authData.user.id, {
+        full_name: form.name,
         phone: form.phone,
         city: form.city,
-        company_name: form.companyName || '',
-        business_type: form.businessType || '',
-        role: 'employer',
-      };
-      localStorage.setItem('mazdoorping_user', JSON.stringify(mockUser));
-      router.push('/dashboard');
-    }, 1000);
-  };
+        company_name: form.companyName,
+        business_type: form.businessType,
+      })
 
-  const stepLabels = ['Basic Info', 'Location', 'Business'];
+      if (profileError) {
+        setError('Account created but profile setup failed. Please contact support.')
+        setLoading(false)
+        return
+      }
+
+      router.push('/dashboard')
+    }
+  }
+
+  const stepLabels = ['Basic Info', 'Location', 'Business']
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Blue gradient header */}
       <div className="bg-gradient-to-br from-blue-600 to-blue-700 px-6 pt-14 pb-12 rounded-b-[36px] relative overflow-hidden">
         <div className="absolute -top-16 -right-16 w-48 h-48 bg-white/10 rounded-full" />
         <div className="max-w-md mx-auto relative z-10">
@@ -102,7 +118,6 @@ export default function RegisterPage() {
           <p className="text-blue-100 text-sm mt-1">
             Step {step} of 3 — {stepLabels[step - 1]}
           </p>
-          {/* Progress bar */}
           <div className="mt-4 flex gap-2">
             {[1, 2, 3].map((s) => (
               <div
@@ -116,7 +131,6 @@ export default function RegisterPage() {
         </div>
       </div>
 
-      {/* Form */}
       <div className="flex-1 px-5 -mt-4 pb-8">
         <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/60 p-6 max-w-md mx-auto border border-gray-100/50">
           {error && (
@@ -126,7 +140,7 @@ export default function RegisterPage() {
           )}
 
           {step === 1 && (
-            <form onSubmit={(e) => { e.preventDefault(); handleNext(); }} className="space-y-4">
+            <form onSubmit={(e) => { e.preventDefault(); handleNext() }} className="space-y-4">
               <div className="space-y-2">
                 <Label>Full Name *</Label>
                 <div className="relative">
@@ -207,7 +221,7 @@ export default function RegisterPage() {
           )}
 
           {step === 2 && (
-            <form onSubmit={(e) => { e.preventDefault(); handleNext(); }} className="space-y-4">
+            <form onSubmit={(e) => { e.preventDefault(); handleNext() }} className="space-y-4">
               <div className="space-y-2">
                 <Label>City *</Label>
                 <div className="relative">
@@ -342,5 +356,5 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

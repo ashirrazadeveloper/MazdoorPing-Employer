@@ -1,52 +1,48 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Building2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Building2 } from 'lucide-react'
+import { signInWithEmail } from '@/lib/services'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 export default function LoginPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const router = useRouter()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (!email || !password) {
-      setError('Please fill in all fields');
-      return;
+      setError('Please fill in all fields')
+      return
     }
-    setLoading(true);
-    setError('');
+    setLoading(true)
+    setError('')
 
-    setTimeout(() => {
-      const mockUser = {
-        id: 'emp-1',
-        email: email,
-        name: 'Ahmed Khan',
-        phone: '+92 300 1234567',
-        city: 'Lahore',
-        company_name: 'Khan Builders',
-        role: 'employer',
-      };
-      localStorage.setItem('mazdoorping_user', JSON.stringify(mockUser));
-      router.push('/dashboard');
-    }, 1000);
-  };
+    const { error: authError } = await signInWithEmail(email, password)
+
+    if (authError) {
+      setError(authError.message === 'Invalid login credentials'
+        ? 'Invalid email or password'
+        : authError.message)
+      setLoading(false)
+      return
+    }
+
+    router.push('/dashboard')
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Blue gradient header */}
       <div className="bg-gradient-to-br from-blue-600 to-blue-700 px-6 pt-14 pb-20 rounded-b-[36px] relative overflow-hidden">
-        {/* Decorative circles */}
         <div className="absolute -top-16 -right-16 w-48 h-48 bg-white/10 rounded-full" />
         <div className="absolute bottom-4 -left-8 w-32 h-32 bg-white/5 rounded-full" />
-
         <div className="max-w-md mx-auto relative z-10">
           <div className="flex items-center gap-3 mb-10">
             <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
@@ -62,7 +58,6 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Form card */}
       <div className="flex-1 px-5 -mt-10 pb-8">
         <div className="bg-white rounded-3xl shadow-lg shadow-gray-200/60 p-6 max-w-md mx-auto border border-gray-100/50">
           {error && (
@@ -73,13 +68,13 @@ export default function LoginPage() {
 
           <form onSubmit={handleLogin} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email">Email or Phone</Label>
+              <Label htmlFor="email">Email Address</Label>
               <div className="relative">
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <Input
                   id="email"
-                  type="text"
-                  placeholder="Enter email or phone"
+                  type="email"
+                  placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-11 h-12 bg-gray-50/50 border-gray-200/80 focus-visible:bg-white"
@@ -107,12 +102,6 @@ export default function LoginPage() {
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
-            </div>
-
-            <div className="text-right">
-              <button type="button" className="text-primary text-sm font-medium hover:underline">
-                Forgot Password?
-              </button>
             </div>
 
             <Button
@@ -143,15 +132,7 @@ export default function LoginPage() {
             </p>
           </div>
         </div>
-
-        {/* Demo hint */}
-        <div className="max-w-md mx-auto mt-6 text-center">
-          <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-full text-xs font-medium">
-            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
-            Demo: Enter any email and password to sign in
-          </div>
-        </div>
       </div>
     </div>
-  );
+  )
 }
